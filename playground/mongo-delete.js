@@ -9,13 +9,18 @@ MongoClient.connect('mongodb://localhost:27017/TodoApp',(err,Clinet)=>{
     // db.collection('Todos').deleteMany({text:'hello'}).then( (result)=>{
     //     console.log(result)
     // })
+
+
+    // db.collection('Todos').deleteOne({text:'hello'}).then( (result)=>{
+    //     console.log(result)
+    // })
     db.collection('Todos')
     .findOneAndDelete({_id:ObjectID("5bfed141ce23260ba0604c5a")})
     .then((result)=>{
         console.log(result);
     })
 
-    //db.close();
+    db.close();
     
 
 
