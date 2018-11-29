@@ -25,8 +25,8 @@ app.post('/addtodo',(req,res)=>{
     })
 })
 app.post('/adduser',(req,res)=>{
-    console.log(req);
-    var user = new User(req)
+    console.log(req.body);
+    var user = new User(req.body)
     user.save().then((data)=>{
         res.send(ret);
         console.log(ret);
@@ -40,3 +40,8 @@ app.post('/adduser',(req,res)=>{
 app.listen(3000, ()=>{
     console.log("server run on port 3000");
 })
+
+
+module.exports ={
+    app
+}
