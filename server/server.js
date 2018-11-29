@@ -1,40 +1,42 @@
+var express =require('express')
+var bodyparser = require('body-parser')
 
-var mongoose = require('mongoose');
 
 
-mongoose.Promise = global.Promise;
+var {mongoose} = require('./db/mongoose')
+var {Todo} = require('./models/todo')
+var {User} = require('./models/user')
 
-mongoose.connect('mongodb://localhost:27017/TodoApp')
 
-var Todo = mongoose.model('Todo',{
-    text:{
-        type:String
-    },
-    complated:{
-        type :Boolean
-    },
-    complatedAt:{
-        type:Number
-    }
+var app  = express();
+app.use(bodyparser.json());
+
+app.post('/addtodo',(req,res)=>{
+    
+    console.log(req.body);
+    var todo = new Todo(req.body);
+    todo.save()
+    .then((ret)=>{
+        res.send(ret);
+        console.log(ret);
+    },(err)=>{
+        res.status(400).send(err);
+        console.log("err");
+    })
+})
+app.post('/adduser',(req,res)=>{
+    console.log(req);
+    var user = new User(req)
+    user.save().then((data)=>{
+        res.send(ret);
+        console.log(ret);
+    },(err)=>{
+        res.status(400).send(err);
+        console.log("err");
+    })
 })
 
-// var newTodo = new Todo({
-//     text:'dinner done'
-// })
-// newTodo.save().then((res)=>{
-//     console.log("save todo",res);
-// },(err)=>{
-//     console.log("can't save obj");
-// })
 
-var newtask = new Todo({
-    text:'wake salah at 7 am',
-    complated:true,
-    complatedAt:123
-})
-
-newtask.save().then((ret)=>{
-    console.log(JSON.stringify(ret, undefined, 2));
-},(err)=>{
-    console.log("can't save obj");
+app.listen(3000, ()=>{
+    console.log("server run on port 3000");
 })
