@@ -105,3 +105,43 @@ describe('/Users',()=>{
             })
     })
 })
+
+
+describe('post /user/login',()=>{
+    it("sould login user and return token",(done)=>{
+        request(app)
+            .post('/users/login')
+            .send({
+                email:users[1].email,
+                password:users[1].password
+            })
+            .expect(200)
+            .expect((res)=>{
+                expect(res.header['x-auth']).toExist();
+            }).end((err, res)=>{
+                if(err){
+                    return done(err);
+                }
+                User.findById(users[1]._id).then((user)=>{
+                    expect(user.tokens[0]).toInclude({
+                        access:'auth',
+                        token:res.header['x-auth']
+                    })
+                    done();
+                }).catch( (e)=>done(e));
+            })
+    })
+    it("should return login faild",(done)=>{
+        request(app)
+            .post('/users/login')
+            .send({
+                email:users[1],
+                password:users[1].password + 'a'
+            })
+            .expect(400)
+            .expect((res)=>{
+                expect(res.header['x-auth']).toNotExist();
+
+            }).end(done)
+    })
+})
