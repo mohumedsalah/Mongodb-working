@@ -2,6 +2,7 @@ var express =require('express')
 var bodyparser = require('body-parser')
 const _ = require('lodash');
 const {ObjectID} = require('mongodb')
+const bcrypt = require('bcryptjs')
 
 var {mongoose} = require('./db/mongoose')
 var {Todo} = require('./models/todo')
@@ -10,6 +11,22 @@ var {authenticate} = require('./middleware/authenticate')
 
 var app  = express();
 app.use(bodyparser.json());
+
+app.post('/addtodo',(req,res)=>{
+    
+    console.log(req.body);
+    var todo = new Todo(req.body);
+    todo.save()
+    .then((ret)=>{
+        res.send(ret);
+        console.log(ret);
+    },(err)=>{
+        res.status(400).send(err);
+        console.log("err");
+    })
+})
+
+
 
 app.get('/todos',(req, res)=>{
     Todo.find().then((todos)=>{
@@ -79,6 +96,26 @@ app.post('/Users',(req,res)=>{
 
 app.get('/users/me', authenticate, (req, res)=>{
    res.send(req.user);
+})
+
+// post /users/login {email, password}
+
+
+app.post('/users/login',(req, res)=>{
+    //console.log(req.body);
+    //res.send(req.body);
+    var body = _.pick(req.body,['email', 'password']);
+    //console.log(body)
+   User.findByCredentials(body.email, body.password).then((user)=>{
+       //console.log(user,'*--**-**-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*')
+       return user.generateAuthToken().then((token)=>{
+         res.header('x-auth',token).send(user);  
+       })
+       res.send(user);
+   }).catch( (e)=>{
+        res.status(400).send();
+   })
+    
 })
 
 
